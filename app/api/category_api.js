@@ -6,8 +6,12 @@ export const fetchCategories = () => (
 
 export const fetchCategory = id => (
     apiClient.get(`/categories/${id}`)
-)
+);
+
+export const createCategory = category => (
+    apiClient.post('/categories', category)
+);
 
 export const deleteCategory = id => (
     apiClient.delete(`/categories/${id}`)
-)
+);

@@ -1,15 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, View, StyleSheet } from 'react-native';
+import { Dimensions, FlatList, View, StyleSheet } from 'react-native';
 
 import AppText from '../components/AppText';
-import { deleteCategory, fetchCategories } from '../api/category_api';
+import { createCategory, deleteCategory, fetchCategories } from '../api/category_api';
 import ListItem from '../components/ListItem';
 import ListItemDelete from '../components/ListItemDelete';
+import NewListItem from '../components/NewListItem';
 import Screen from '../components/Screen';
 
 
 const Categories = ({ navigation }) => {
   const [categories, setCategories] = useState();
+
+  const { height } = Dimensions.get('window');
+
+  const handleSubmit = input => {
+    const data = new FormData();
+    data.append("category[title]", input);
+    createCategory(data)
+      .then(res => {
+        fetchCategories()
+          .then(res => {
+          setCategories(res.data);
+        });
+      });
+  }
 
   const handleDelete = id => {
     deleteCategory(id)
@@ -35,11 +50,14 @@ const Categories = ({ navigation }) => {
         { categories &&
           <View stle={styles.list}>
             <FlatList 
-              contentContainerStyle={{ flexGrow: 1 }}
+              contentContainerStyle={{ flexGrow: 1, minHeight: height }}
+              contentOffset={{ y: 148 }}
               data={categories}
               keyExtractor={task => task.id.toString()}
+              ListHeaderComponent={<NewListItem handleSubmit={handleSubmit} />}
               renderItem={({ item }) => (
                 <ListItem
+                  complete={item}
                   onPress={() => handlePress(item)}
                   title={item.title} 
                   renderRightActions={() => 
